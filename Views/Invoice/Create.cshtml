@@ -1,0 +1,127 @@
+﻿@model WebAppInvoiceSystem.Models.InvoiceHeader
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+@if (ViewBag.ErrorResult != null)
+{
+    <h1 class="alert alert-danger">@ViewBag.ErrorResult</h1>
+}
+<button type="button" class="addInvoice" data-toggle="modal" data-target="#myModal">
+    Add Invoice Details
+</button>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    <h4>InvoiceHeader</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="form-group">
+        @Html.LabelFor(model => model.CustomerName, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.CustomerName, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.CustomerName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Invoicedate, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Invoicedate, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Invoicedate, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Cashier", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("CashierID", null, htmlAttributes: new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.CashierID, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Branch", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("BranchID", null, htmlAttributes: new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.BranchID, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    @if (WebAppInvoiceSystem.Repository.InvoiceRepo.InvoiceDetailsRepo.Count() > 0)
+    {
+        <table class="table table-hover table-striped table-bordered">
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Qty</th>
+                
+            </tr>
+            @foreach (var item in WebAppInvoiceSystem.Repository.InvoiceRepo.InvoiceDetailsRepo)
+            {
+
+                <tr>
+                    <td>@item.ItemName</td>
+                    <td>@item.ItemPrice</td>
+                    <td>@item.ItemCount</td>
+                   
+
+                </tr>
+
+            }
+        </table>
+    }
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Create" class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(".addInvoice").click(function (e) {
+            $.ajax({
+                url: "/Invoice/CreateInvoiceDetails/",
+                type: "get",
+                success: function (result) {
+                    $("#ajaxModal").html(result);
+                },
+                error: function (error) {
+                    console.log("Error Is  " + error);
+                }
+            });
+
+        })
+    </script>
+
+}
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Edit Invoice Details</h4>
+            </div>
+            <div id="ajaxModal"></div>
+        </div>
+    </div>
+</div>
+
+
+

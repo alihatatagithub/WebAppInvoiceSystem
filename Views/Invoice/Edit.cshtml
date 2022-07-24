@@ -1,0 +1,130 @@
+﻿@model WebAppInvoiceSystem.Models.InvoiceHeader
+
+@{
+    ViewBag.Title = "Edit";
+}
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.ID)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.CustomerName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.CustomerName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.CustomerName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Invoicedate, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Invoicedate, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Invoicedate, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.CashierID, "Cashier", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("CashierID", null, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.CashierID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BranchID, "BranchID", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("BranchID", null, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.BranchID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <table class="table table-hover table-striped table-bordered">
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th></th>
+                </tr>
+                @foreach (var item in WebAppInvoiceSystem.Repository.InvoiceRepo.InvoiceDetailsRepo)
+                {
+                    
+                    <tr>
+                        <td>@item.ItemName</td>
+                        <td>@item.ItemPrice</td>
+                        <td>@item.ItemCount</td>
+                        <td>
+                            <button type="button" data-invoice-id="@item.ID" class="editInvoice" data-toggle="modal" data-target="#myModal">
+                                Edit Invoice Details
+                            </button>
+                        </td>
+
+                    </tr>
+
+                }
+            </table>
+
+
+
+        </div>
+ 
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-4">
+            <a href="@Url.Action("Index")" class="btn btn-default" data-dismiss="modal">Close</a>
+        </div>
+
+        <div class="col-sm-4">
+            <button type="submit" class="btn btn-primary" data-dismiss="modal">Save Changes</button>
+        </div>
+    </div>
+</div>
+    }
+@Scripts.Render("~/bundles/jquery")
+
+@Scripts.Render("~/bundles/jqueryval")
+
+
+@section scripts{
+    <script>
+        $(".editInvoice").click(function (e) {
+            $.ajax({
+                url: "/Invoice/EditInvoiceDetails/" + $(e.target).attr("data-invoice-id") + "?InvoiceHeaderId=" +@Model.ID,
+                type: "get",
+                success: function (result) {
+                    $("#ajaxModal").html(result);
+                },
+                error: function (error) {
+                    console.log("Error Is  " + error);
+                }
+            });
+
+        })
+    </script>
+
+}
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Edit Invoice Details</h4>
+            </div>
+            <div id="ajaxModal"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
